@@ -5,21 +5,67 @@
 
 from selenium import webdriver as wd
 
-# 사전에 필요한 정보를 로드 => 디비 혹은 쉘, 배치 파일에서 인자로 받아서 세팅
+#0. 사전에 필요한 정보를 로드 => 디비 혹은 쉘, 배치 파일에서 인자로 받아서 세팅
 main_url = 'https://tour.interpark.com/'
 keyword = '로마'
 
-# 드라이버 로드 : ChromeDriver - WebDriver for Chrome 을 찾아 윈도우용으로 받아서 현재 폴더에 저장
+#1. 드라이버 로드 : ChromeDriver - WebDriver for Chrome 을 찾아 윈도우용으로 받아서 현재 폴더에 저장
 driver = wd.Chrome(executable_path='chromedriver.exe')
 # 차후 -> 옵션 부여하여 (프록시, 에이전트 조작, 이미지를 배제(속도 증가효과))
 # 크롤링을 오래 돌리면 -> temp에 임시파일들이 쌓인다! -> 템프 파일 삭제
 
-# 사이트 접속 (get)
+#2. 사이트 접속 (get)
 driver.get(main_url)
-# 검색창을 찾아서 검색어를 입력
+#3. 검색창을 찾아서 검색어를 입력
 # 여기에 대기하는 웨이트를 걸어야 함.
 # "id : SearchGNBText" 임을 확인 <- chrome 검사에서 확인
 driver.find_element_by_id('SearchGNBText').send_keys(keyword) # 검색단어 입력
-# 검색버튼을 클릭
-# 잠시 대기 => 페이지가 로드되고 나서 즉각적으로 데이터를 획들하는 행위는 자제하시기 바랍니다.
+# 수정할 경우 => 뒤에 내용이 붙어 버림. 새로운 내용을 집어 넣고자 할때 문제 발생
+# => 그래서 .clear() 후에 -> send.keys('내용') 으로 진행해야 함.
+# driver.find_element_by_id('SearchGNBText').send_keys('파리') # 진행하면 => 검색어가 '로마파리' 진행됨.
+# driver.find_element_by_id('SearchGNBText').clear()
+# driver.find_element_by_id('SearchGNBText').send_keys('파리')
+#4. 검색버튼을 클릭
+driver.find_element_by_css_selector('.search-btn').click() # class 명칭이 'search-btn' 인경우가 하나밖에 없어서 가능
+                                                   # 그렇지 않을 경우 'button.search-btn' 기입해야 함.
+
+#5. 잠시 대기 => 페이지가 로드되고 나서 즉각적으로 데이터를 획들하는 행위는 자제하시기 바랍니다.
+# 참조 https://selenium-python.readthedocs.io/waits.html
+# Explicit waits: 인스턴스가 발생할 때까지 wait,
+# 화면가 화면이 넘어갈때는 반드시 사용해야 함. 페이지가 넘어갈 때는 반드시 해야 함
+# 명시적 대기 => 특정 요소가 로케이트(발견될 때까지) 대기
+# driver = webdriver.Firefox()
+# driver.get("http://somedomain/url_that_delays_loading")
+# try:
+#     element = WebDriverWait(driver, 10).until(
+#         EC.presence_of_element_located((By.ID, "myDynamicElement"))
+#     )
+# finally:
+#     driver.quit()
+from selenium.webdriver.common.by import By
+# 명시적 대기를 위하여 아래 import
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+# 위 모듈 import 필요 (https://selenium-python.readthedocs.io/waits.html 에서 paste)
+try:
+    element = WebDriverWait(driver, 10).until(
+        #지정한 한 개 요소가 올라오면 웨이트를 종료
+        EC.presence_of_element_located((By.CLASS_NAME, "oTravelBox"))
+    )
+    # 대기 시간 10초, 끝나면 10초 전이라도 실행함.
+except Exception as e:
+    print('오류 발생', e)
+
+# Implicit Wait: 일정한 시간을 기다린 후 실행
+# 암묵적 대기 => DOM이 다 로드될 때까지 대기하고 먼저 로드되면 바로 진행
+# driver = webdriver.Firefox()
+# driver.implicitly_wait(10) # seconds 10초를 기다리고 실행
+# driver.get("http://somedomain/url_that_delays_loading")
+# myDynamicElement = driver.find_element_by_id("myDynamicElement")
+# 요소를 찾을 특정 시간 동안 DOM풀림을 지시. 예를 들어 10초 이내라고 발견 되면 바로 진행(명시적과 공통 사항)
+driver.implicitly_wait(10) # 10초 대기
+# 절대적 대기 => time.sleep() 무조건 대기, -> 클라우드 페어(DDOS 방어 솔루션)
 # 이유는 ? 페이지가 변경되면 기다린다.(로드될 때까지 기다림. 평균 10초)
+# 6. 더 보기 누르기 => 게시판 진입
+
+driver.find_element_by_css_selector('div.oTravelBox > ul.boxList > li.moreBtnWrap > button.moreBtn').click()
