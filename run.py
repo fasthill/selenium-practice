@@ -81,11 +81,31 @@ driver.find_element_by_css_selector('div.oTravelBox > ul.boxList > li.moreBtnWra
 
 # 6+1은 임시 값, 게시물을 넘어갔을 때 현상을 확인차 추가함(현재는 6개까지 표시됨)
 import time
-for page in range(1,7):
+numpage = 1 # 데스트를 위하여 7에서 임시로 1개만 갖고 테스트
+for page in range(1,1+numpage):
     try:
         # 자바 스크립트 구동하기
         driver.execute_script("searchModule.SetCategoryList(%s, '') " % page) # 실행될 때마다 페이지가 새로 발생함
         time.sleep(2) # 강제로 2초씩 쉼. 페이지가 생길 때 사용되는 시간을 기다림.(명시적, 묵시적 방법도 사용할 수 있음)
         print("%s 페이지 이동" %page)
+        #################
+        # 여러사이트에서 정보를 수집할 경우, 공통정보 정의 단계 필요
+        # 상품명, 코멘트, 기간1, 기간2, 가격, 평점, 섬네일, 링크(상품상세정보)
+        boxItems = driver.find_elements_by_css_selector('div.oTravelBox>ul.boxList>li.boxItem') # elements 복수에 유의
+        # 상품 하나 하나 접근
+        for li in boxItems:
+            print('상품명: ',li.find_element_by_css_selector('.boxTables > div.title-row h5.proTit').text)
+            print('코멘트: ',li.find_element_by_css_selector('.boxTables > div.title-row p.proSub').text)
+            print('가격: ',li.find_element_by_css_selector('.boxTables > div.title-row strong.proPrice').text)
+            print('기간1: ', li.find_elements_by_css_selector('.boxTables > div.info-row > div > p.proInfo')[0].text)
+            print('기간2: ', li.find_elements_by_css_selector('.boxTables > div.info-row > div > p.proInfo')[1].text)
+            print('평점: ', li.find_element_by_css_selector('.boxTables > div.info-row > div > .proSpeacial ~p.proInfo').text)
+            print('섬네일: ', li.find_element_by_css_selector('a > img').get_attribute('src'))
+            print('링크: ', li.find_element_by_css_selector('a').get_attribute('onclick').split("'")[1])
+
+
+            print('---------------------------------------------')
+
+
     except Exception as e1:
         print("오류", e1)
