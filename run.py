@@ -69,3 +69,23 @@ driver.implicitly_wait(10) # 10초 대기
 # 6. 더 보기 누르기 => 게시판 진입
 
 driver.find_element_by_css_selector('div.oTravelBox > ul.boxList > li.moreBtnWrap > button.moreBtn').click()
+
+# 게시판에서 데이터를 가져올 때
+# 데이터가 많으면 ㅔ션(혹시 로그린을 해서 접근되는 사이트일 경우) 관리
+# 특정 단위별로 로그아웃 로그인을 게속 시도
+# 특정 게시물이 사라질 경우 => 팝업 발생(없는글... 등) => 팝업 처리 검토 필요
+# 단, 로그인도 하지 않고, 수집 데이터가 많지 않을 때는 위의 경우는 나타나지 않음. (몇백개 정도는 문제 없음.)
+# 게시판을 스캔시 => 임계점을 모름!!
+# 게시판을 스캔을 하여 메타 정보(전체갯수)를 획득을 하여 loop를 돌려서 일괄적으로 방문 접근 처리
+# searchModule.SetCategoryList(1, '') 스크립트 실행 <= 웹페이지 검사에서 확인
+
+# 6+1은 임시 값, 게시물을 넘어갔을 때 현상을 확인차 추가함(현재는 6개까지 표시됨)
+import time
+for page in range(1,7):
+    try:
+        # 자바 스크립트 구동하기
+        driver.execute_script("searchModule.SetCategoryList(%s, '') " % page) # 실행될 때마다 페이지가 새로 발생함
+        time.sleep(2) # 강제로 2초씩 쉼. 페이지가 생길 때 사용되는 시간을 기다림.(명시적, 묵시적 방법도 사용할 수 있음)
+        print("%s 페이지 이동" %page)
+    except Exception as e1:
+        print("오류", e1)
