@@ -69,6 +69,7 @@ driver.implicitly_wait(10) # 10초 대기
 # 6. 더 보기 누르기 => 게시판 진입
 
 driver.find_element_by_css_selector('div.oTravelBox > ul.boxList > li.moreBtnWrap > button.moreBtn').click()
+#driver.find_element_by_css_selector('div.oTravelBox > ul.boxList > li.moreBtnWrap > button.moreBtn')
 
 # 게시판에서 데이터를 가져올 때
 # 데이터가 많으면 ㅔ션(혹시 로그린을 해서 접근되는 사이트일 경우) 관리
@@ -86,7 +87,7 @@ for page in range(1,1+numpage):
     try:
         # 자바 스크립트 구동하기
         driver.execute_script("searchModule.SetCategoryList(%s, '') " % page) # 실행될 때마다 페이지가 새로 발생함
-        time.sleep(2) # 강제로 2초씩 쉼. 페이지가 생길 때 사용되는 시간을 기다림.(명시적, 묵시적 방법도 사용할 수 있음)
+        #time.sleep(2) # 강제로 2초씩 쉼. 페이지가 생길 때 사용되는 시간을 기다림.(명시적, 묵시적 방법도 사용할 수 있음)
         print("%s 페이지 이동" %page)
         #################
         # 여러사이트에서 정보를 수집할 경우, 공통정보 정의 단계 필요
@@ -101,7 +102,19 @@ for page in range(1,1+numpage):
             print('기간2: ', li.find_elements_by_css_selector('.boxTables > div.info-row > div > p.proInfo')[1].text)
             print('평점: ', li.find_element_by_css_selector('.boxTables > div.info-row > div > .proSpeacial ~p.proInfo').text)
             print('섬네일: ', li.find_element_by_css_selector('a > img').get_attribute('src'))
-            print('링크: ', li.find_element_by_css_selector('a').get_attribute('onclick').split("'")[1])
+            #print('링크: ', li.find_element_by_css_selector('a').get_attribute('onclick').split("'")[1])
+            print('링크: ', li.find_element_by_css_selector('a').get_attribute('onclick'))
+            li.find_element_by_css_selector('a').click() # wait 관련 확인하고 진행해야 하는가?
+            # driver.implicitly_wait(10) # 10초 대기
+            try:
+                element = WebDriverWait(driver, 10).until(
+                    # 지정한 한 개 요소가 올라오면 웨이트를 종료
+                    EC.presence_of_element_located((By.CLASS_NAME, "selc-date j-traffic"))
+                    # 새 페이지에서 출발일 및 교통편 선택(class name: 'sec-date j-traffic')이 로딩될 때까지 wait 함
+                )
+                # 대기 시간 10초, 끝나면 10초 전이라도 실행함.
+            except Exception as e:
+                print('오류 발생', e)
 
 
             print('---------------------------------------------')
