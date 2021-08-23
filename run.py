@@ -144,3 +144,27 @@ for page in range(1, 1+numpage):
 
     print(len(tour_list))
     # 수집한 정보 갯수를 루프 => 페이지 방문 => 콘텐츠 획득(상품상세정보) => DB까지..
+    for tour in tour_list:
+        # tour = TourInfo
+        print(type(tour))
+        # 링크 데이터에서 실데이터 획득
+        # 분해
+        arr = tour.link.split(',')
+        # 대체
+        if arr:
+            # 대체
+            link = arr[0].replace('searchModule.OnClickDetail(','')
+            # 슬라이싱 => 앞의 ',', 뒤의 ',' 제거
+            detail_url = link[1:-1]
+            # 상세 페이지 이름 : URL 값이 완성된 형태인지 확인 필요(hrrp~)
+            driver.get(detail_url)
+            time.sleep(2)
+
+    # 종료 , 아래 내용은 반드시 실행해야 함. 프로그램할 때 아래 내용 미리 기입해 놓고 작성하는 것이 좋음.
+    driver.close()
+    driver.quit()
+    import sys
+    sys.exit()
+
+
+
