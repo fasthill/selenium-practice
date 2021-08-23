@@ -4,12 +4,14 @@
 # pip install selenium
 
 from selenium import webdriver as wd
+from bs4 import BeautifulSoup as bs
 
 # 0. 사전에 필요한 정보를 로드 => 디비 혹은 쉘, 배치 파일에서 인자로 받아서 세팅
 main_url = 'https://tour.interpark.com/'
 keyword = '로마'
 # 상품정보를 담는 리스트 (tour_list)
 from Tour import TourInfo
+
 tour_list = []
 
 # 1. 드라이버 로드 : ChromeDriver - WebDriver for Chrome 을 찾아 윈도우용으로 받아서 현재 폴더에 저장
@@ -49,6 +51,7 @@ from selenium.webdriver.common.by import By
 # 명시적 대기를 위하여 아래 import
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+
 # 위 모듈 import 필요 (https://selenium-python.readthedocs.io/waits.html 에서 paste)
 try:
     element = WebDriverWait(driver, 10).until(
@@ -66,7 +69,7 @@ except Exception as e:
 # driver.get("http://somedomain/url_that_delays_loading")
 # myDynamicElement = driver.find_element_by_id("myDynamicElement")
 # 요소를 찾을 특정 시간 동안 DOM풀림을 지시. 예를 들어 10초 이내라고 발견 되면 바로 진행(명시적과 공통 사항)
-driver.implicitly_wait(10) # 10초 대기
+driver.implicitly_wait(10)  # 10초 대기
 # 절대적 대기 => time.sleep() 무조건 대기, -> 클라우드 페어(DDOS 방어 솔루션)
 # 이유는 ? 페이지가 변경되면 기다린다.(로드될 때까지 기다림. 평균 10초)
 # 6. 더 보기 누르기 => 게시판 진입
@@ -85,8 +88,9 @@ driver.find_element_by_css_selector('div.oTravelBox > ul.boxList > li.moreBtnWra
 
 # 6+1은 임시 값, 게시물을 넘어갔을 때 현상을 확인차 추가함(현재는 6개까지 표시됨)
 import time
+
 numpage = 1  # 데스트를 위하여 7에서 임시로 1개만 갖고 테스트
-for page in range(1, 1+numpage):
+for page in range(1, 1 + numpage):
     try:
         # 자바 스크립트 구동하기
         driver.execute_script("searchModule.SetCategoryList(%s, '') " % page)  # 실행될 때마다 페이지가 새로 발생함
@@ -96,9 +100,8 @@ for page in range(1, 1+numpage):
         # 여러사이트에서 정보를 수집할 경우, 공통정보 정의 단계 필요
         # 상품명, 코멘트, 기간1, 기간2, 가격, 평점, 섬네일, 링크(상품상세정보)
         boxItems = driver.find_elements_by_css_selector('div.oTravelBox>ul.boxList>li.boxItem')  # elements 복수에 유의
-        driver.implicitly_wait(10)  # 10초 대기
         # 상품 하나 하나 접근
-        for li in boxItems:
+        for li in boxItems[0:2]:
             prod_name = li.find_element_by_css_selector('.boxTables > div.title-row h5.proTit').text
             comment = li.find_element_by_css_selector('.boxTables > div.title-row p.proSub').text
             price = li.find_element_by_css_selector('.boxTables > div.title-row strong.proPrice').text
@@ -119,24 +122,22 @@ for page in range(1, 1+numpage):
             link = li.find_element_by_css_selector('a').get_attribute('onclick')
             print('링크: ', link)
             # li.find_element_by_css_selector('a').click() # 새 창 pop up, 그런데 새창의 정보는 어떻게 가져오는가?
-            driver.implicitly_wait(10) # 10초 대기
-            # try:
-            #     element = WebDriverWait(driver, 10).until(
-            #         # 지정한 한 개 요소가 올라오면 웨이트를 종료
-            #         EC.presence_of_element_located((By.CLASS_NAME, "selc-date j-traffic"))
-            #         # 새 페이지에서 출발일 및 교통편 선택(class name: 'sec-date j-traffic')이 로딩될 때까지 wait 함
-            #     )
-            #     # 대기 시간 10초, 끝나면 10초 전이라도 실행함.
-            # except Exception as e:
-            #     print('오류 발생', e)
+            # driver.implicitly_wait(10) # 10초 대기 # implicit wait는 한 번만 declare 하면 됨.
+            try: # 안전하게 하기 위하여 explicit wait는 페이지 변환이 일어나는 곳마다 하는 것이 좋음(강은 의견)
+                element = WebDriverWait(driver, 10).until(
+                    EC.presence_of_element_located((By.CLASS_NAME, "selc-date j-traffic"))
+                    # 새 페이지에서 출발일 및 교통편 선택(class name: 'sec-date j-traffic')이 로딩될 때까지 wait 함
+                )
+            except Exception as e:
+                print('오류 발생', e)
 
             # dtest = driver.find_element_by_css_selector('.swiper-containerz guide-info section .guide span')
             # print('가이드: ', dtest.text)
             # driver.execute_script("searchModule.OnClickDetail('http://tour.interpark.com/goods/detail/?BaseGoodsCd=A3015008', '')")
             # print("새링크",driver1.find_element_by_css_selector('.score > .point01').text)
 
-            print('='*70)
-            obj = TourInfo( prod_name, price, schedule2, link, thumbn )
+            print('=' * 70)
+            obj = TourInfo(prod_name, price, schedule2, link, thumbn)
             tour_list.append(obj)
 
     except Exception as e1:
@@ -153,18 +154,21 @@ for page in range(1, 1+numpage):
         # 대체
         if arr:
             # 대체
-            link = arr[0].replace('searchModule.OnClickDetail(','')
+            link = arr[0].replace('searchModule.OnClickDetail(', '')
             # 슬라이싱 => 앞의 ',', 뒤의 ',' 제거
             detail_url = link[1:-1]
             # 상세 페이지 이름 : URL 값이 완성된 형태인지 확인 필요(hrrp~)
             driver.get(detail_url)
             time.sleep(2)
+            # beautifulsoup 설치 이용
+            # 현재 페이지를 beautifulesoup의 DOM으로 구성
+            soup = bs(driver.page_source, 'html.parser')
+            # 현재 상세정보 페이지에서 스케쥴 정보 획득
+            data = soup.select('.schedule-all')
 
     # 종료 , 아래 내용은 반드시 실행해야 함. 프로그램할 때 아래 내용 미리 기입해 놓고 작성하는 것이 좋음.
     driver.close()
     driver.quit()
     import sys
+
     sys.exit()
-
-
-
