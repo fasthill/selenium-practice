@@ -5,7 +5,9 @@
 
 from selenium import webdriver as wd
 from bs4 import BeautifulSoup as bs
-
+# import pymysql as my : DbMgr에서 사용
+from DbMgr import DBHelper as Db
+db = Db()
 # 0. 사전에 필요한 정보를 로드 => 디비 혹은 쉘, 배치 파일에서 인자로 받아서 세팅
 main_url = 'https://tour.interpark.com/'
 keyword = '로마'
@@ -94,16 +96,29 @@ for page in range(1, 1 + numpage):
     try:
         # 자바 스크립트 구동하기
         driver.execute_script("searchModule.SetCategoryList(%s, '') " % page)  # 실행될 때마다 페이지가 새로 발생함
-        # time.sleep(2) # 강제로 2초씩 쉼. 페이지가 생길 때 사용되는 시간을 기다림.(명시적, 묵시적 방법도 사용할 수 있음)
+        try:
+            element = WebDriverWait(driver, 10).until(
+                # 지정한 한 개 요소가 올라오면 웨이트를 종료
+                EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".oTravelBox .boxList"))
+                # _all_elements, _element caution if there are many, should choose _all_elements
+            )
+            # 대기 시간 10초, 끝나면 10초 전이라도 실행함.
+        except Exception as e:
+            print('오류 발생', e)
+        time.sleep(2) # 강제로 2초씩 쉼. 페이지가 생길 때 사용되는 시간을 기다림.(명시적, 묵시적 방법도 사용할 수 있음)
         print("%s 페이지 이동" % page)
         #################
         # 여러사이트에서 정보를 수집할 경우, 공통정보 정의 단계 필요
         # 상품명, 코멘트, 기간1, 기간2, 가격, 평점, 섬네일, 링크(상품상세정보)
-        boxItems = driver.find_elements_by_css_selector('div.oTravelBox>ul.boxList>li.boxItem')  # elements 복수에 유의
+        boxItems = driver.find_elements_by_css_selector('div.oTravelBox>ul.boxList>li.boxItem') # elements 복수에 유의
+        print("2 페이지 이동")
         # 상품 하나 하나 접근
-        for li in boxItems[0:2]:
+        for li in boxItems:
+            print("33 페이지 이동")
             prod_name = li.find_element_by_css_selector('.boxTables > div.title-row h5.proTit').text
+            print("34 페이지 이동")
             comment = li.find_element_by_css_selector('.boxTables > div.title-row p.proSub').text
+            print("35 페이지 이동")
             price = li.find_element_by_css_selector('.boxTables > div.title-row strong.proPrice').text
             schedule1 = li.find_elements_by_css_selector('.boxTables > div.info-row > div > p.proInfo')[0].text
             schedule2 = li.find_elements_by_css_selector('.boxTables > div.info-row > div > p.proInfo')[1].text
@@ -114,22 +129,18 @@ for page in range(1, 1 + numpage):
             print('기간1: ', schedule1)
             print('기간2: ', schedule2)
             print('평점: ', grade)
+            print("3 페이지 이동")
             # 이미지를 링크값을 사용할 것인가?
             # 직접 다운로드 해서 우리 서버에 업로드(ftp) 할 것인가?
             thumbn = li.find_element_by_css_selector('a > img').get_attribute('src')
+            print("4 페이지 이동")
             print('섬네일: ', thumbn)
             # print('링크: ', li.find_element_by_css_selector('a').get_attribute('onclick').split("'")[1])
             link = li.find_element_by_css_selector('a').get_attribute('onclick')
+            print("5 페이지 이동")
             print('링크: ', link)
             # li.find_element_by_css_selector('a').click() # 새 창 pop up, 그런데 새창의 정보는 어떻게 가져오는가?
             # driver.implicitly_wait(10) # 10초 대기 # implicit wait는 한 번만 declare 하면 됨.
-            try: # 안전하게 하기 위하여 explicit wait는 페이지 변환이 일어나는 곳마다 하는 것이 좋음(강은 의견)
-                element = WebDriverWait(driver, 10).until(
-                    EC.presence_of_element_located((By.CLASS_NAME, "selc-date j-traffic"))
-                    # 새 페이지에서 출발일 및 교통편 선택(class name: 'sec-date j-traffic')이 로딩될 때까지 wait 함
-                )
-            except Exception as e:
-                print('오류 발생', e)
 
             # dtest = driver.find_element_by_css_selector('.swiper-containerz guide-info section .guide span')
             # print('가이드: ', dtest.text)
@@ -158,13 +169,32 @@ for page in range(1, 1 + numpage):
             # 슬라이싱 => 앞의 ',', 뒤의 ',' 제거
             detail_url = link[1:-1]
             # 상세 페이지 이름 : URL 값이 완성된 형태인지 확인 필요(hrrp~)
+            print("6 페이지 이동")
             driver.get(detail_url)
             time.sleep(2)
+            print("7 페이지 이동")
             # beautifulsoup 설치 이용
             # 현재 페이지를 beautifulesoup의 DOM으로 구성
             soup = bs(driver.page_source, 'html.parser')
             # 현재 상세정보 페이지에서 스케쥴 정보 획득
+            #data = soup.select('.schedule-all')
             data = soup.select('.schedule-all')
+            print(type(data), len(data))
+            # dBody > div.default-section.goods-info > div.info-list > div.goods-point.section > ul
+            # 디비 입력 => pymysql 활용 => pip install pymysql
+            content = data[0].select_one('h3').text
+            print("contents:", content)
+            #contents 내용에 따라서 전처리가 필요할 수 있음.
+            db.db_insertCrawlingData(
+                tour.title,
+                tour.price,
+                tour.area,
+                content,
+                keyword
+            )
+
+
+
 
     # 종료 , 아래 내용은 반드시 실행해야 함. 프로그램할 때 아래 내용 미리 기입해 놓고 작성하는 것이 좋음.
     driver.close()
