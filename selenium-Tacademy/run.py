@@ -95,17 +95,17 @@ numpage = 1  # 데스트를 위하여 7에서 임시로 1개만 갖고 테스트
 for page in range(1, 1 + numpage):
     try:
         # 자바 스크립트 구동하기
-        driver.execute_script("searchModule.SetCategoryList(%s, '') " % page)  # 실행될 때마다 페이지가 새로 발생함
+        # driver.execute_script("searchModule.SetCategoryList(%s, '') " % page)  # 실행될 때마다 페이지가 새로 발생함
+        # time.sleep(2) # 강제로 2초씩 쉼. 페이지가 생길 때 사용되는 시간을 기다림.(명시적, 묵시적 방법도 사용할 수 있음)
+
+        # 위 두개의 command보다 아래 Explicit wait  이용
         try:
-            element = WebDriverWait(driver, 10).until(
-                # 지정한 한 개 요소가 올라오면 웨이트를 종료
-                EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".oTravelBox .boxList"))
-                # _all_elements, _element caution if there are many, should choose _all_elements
-            )
+            ele = WebDriverWait(driver, 10).until(
+                    driver.execute_script("searchModule.SetCategoryList(%s, '') " % page))
+                # lambda driver: driver.execute_script("searchModule.SetCategoryList(%s, '') " % page))
             # 대기 시간 10초, 끝나면 10초 전이라도 실행함.
         except Exception as e:
             print('오류 발생', e)
-        time.sleep(2) # 강제로 2초씩 쉼. 페이지가 생길 때 사용되는 시간을 기다림.(명시적, 묵시적 방법도 사용할 수 있음)
         print("%s 페이지 이동" % page)
         #################
         # 여러사이트에서 정보를 수집할 경우, 공통정보 정의 단계 필요
