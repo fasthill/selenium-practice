@@ -3,7 +3,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-driver = wd.Chrome(executable_path='chromedriver.exe')
+driver = wd.Chrome(executable_path='selenium-Tacademy/chromedriver.exe')
 
 driver.implicitly_wait(10)
 
