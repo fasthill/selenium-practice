@@ -5,6 +5,13 @@
 
 from selenium import webdriver as wd
 from bs4 import BeautifulSoup as bs
+# 아래 3가지 wait 사용시 필요
+from selenium.webdriver.common.by import By
+# 명시적 대기를 위하여 아래 import
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+# wait를 위하여 모듈 import 필요 (https://selenium-python.readthedocs.io/waits.html 에서 paste)
+
 # import pymysql as my : DbMgr에서 사용
 from DbMgr import DBHelper as Db
 db = Db()
@@ -49,12 +56,6 @@ driver.find_element_by_css_selector('.search-btn').click()  # class 명칭이 's
 #     )
 # finally:
 #     driver.quit()
-from selenium.webdriver.common.by import By
-# 명시적 대기를 위하여 아래 import
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-
-# 위 모듈 import 필요 (https://selenium-python.readthedocs.io/waits.html 에서 paste)
 try:
     element = WebDriverWait(driver, 10).until(
         # 지정한 한 개 요소가 올라오면 웨이트를 종료
