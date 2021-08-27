@@ -14,7 +14,7 @@ time.sleep(1)
 
 link = driver.find_element_by_link_text('Python Programming')
 link.click()
-# ad pop up skip logic
+# skip ad pop up logic. sometimes ads are popped up and can't bypass to the next step
 driver.back()
 driver.forward()
 # ad pop up
