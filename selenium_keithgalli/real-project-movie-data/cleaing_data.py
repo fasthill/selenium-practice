@@ -28,13 +28,11 @@ import json
 movie_info_list = load_data('data/disney_data.json')
 movie_info_list_temp = []
 for movie in movie_info_list:
-    print(movie.get('Running time','N/A'))  # 'Running time" key가 없을 때 'N/A'반환. 모든 key가 일정치 않아서 확인하는 과정
+    print(movie.get('Running time', 'N/A'))  # 'Running time" key가 없을 때 'N/A'반환. 모든 key가 일정치 않아서 확인하는 과정
 # 상기 과정을 거쳐 데이터를 확인하고 하나 하나 데이터 정리함
-    movie['Running time (int)'] = minute_to_integer(movie.get('Running time','N/A'))
+    movie['Running time (int)'] = minute_to_integer(movie.get('Running time', 'N/A'))
     movie_info_list_temp.append(movie)
 
 save_data('data/disney_datat.json', movie_info_list_temp)
 
-
 # movie_info = get_info_box('https://en.wikipedia.org/wiki/Zorro_(1957_TV_series)#Theatrical')  # correct Nonetype error no attribute 'find'
-

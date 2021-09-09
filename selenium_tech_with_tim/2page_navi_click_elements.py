@@ -4,7 +4,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
 
-PATH = '../selenium-Tacademy/chromedriver.exe'
+PATH = '../selenium_Tacademy/chromedriver.exe'
 driver = webdriver.Chrome(PATH)
 
 driver.set_window_size(1024, 700)

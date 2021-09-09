@@ -6,7 +6,7 @@ import time
 
 # https://selenium-python.readthedocs.io/api.html , see section 7.2 Action Chains
 
-PATH = '../selenium-Tacademy/chromedriver.exe'
+PATH = '../selenium_Tacademy/chromedriver.exe'
 driver = webdriver.Chrome(PATH)
 driver.set_window_size(1024, 700)
 driver.get('https://orteil.dashnet.org/cookieclicker/')
