@@ -36,3 +36,4 @@ for movie in movie_info_list:
 save_data('data/disney_datat.json', movie_info_list_temp)
 
 # movie_info = get_info_box('https://en.wikipedia.org/wiki/Zorro_(1957_TV_series)#Theatrical')  # correct Nonetype error no attribute 'find'
+
