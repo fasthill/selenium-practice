@@ -39,8 +39,4 @@ for mv in movie_info_list:
     mv['Budget (convert)'] = money_conversion(money_budget)
     mv['Box office (convert)'] = money_conversion(money_box_office)
 
-t1 = 'Beauty and the Beast'
-aa = [i for i, sub in enumerate(movie_info_list) if sub['title'] == t1]
-print (aa)
-
 save_data('data/disney_datam.json', movie_info_list)
