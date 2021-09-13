@@ -8,6 +8,8 @@
 
 # test file
 # *.drawio
+selenium_keithgalli/real_project_movie_data/.pytest_cache
+selenium_keithgalli/.idea
 
 .idea/
 # User-specific stuff
