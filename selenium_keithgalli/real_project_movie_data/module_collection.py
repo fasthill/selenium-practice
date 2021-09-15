@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup as bs
 import requests
 import json
+import pickle
 
 def get_content_value(row_data):
     if row_data.find('li'):
@@ -57,6 +58,14 @@ def save_data(title, data):
 def load_data(title):
     with open(title, 'r', encoding='utf-8') as f:
         return json.load(f)
+
+def save_data_pickle(name, data):
+    with open(name, 'wb') as f:
+        pickle.dump(data, f)
+
+def load_data_pickle(name):
+    with open(name, 'rb') as f:
+        return pickle.load(f)
 
 # "85 minutes" => 85
 def minute_to_integer(running_time):
