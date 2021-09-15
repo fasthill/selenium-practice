@@ -15,7 +15,7 @@ datetime_re = rf'{month_re}{date_re}{year_re}'
 def clean_date(date):
     return date.split("(")[0].strip()
 
-def relocate_date_format(date):  # June 1963, 11 June 1964, => June 1, 1963, June 11, 1964
+def relocate_date_format(date):  # June 1963, 1964, => June 1, 1963, January 1, 1964
     date = date.replace('\xa0', ' ')
     date_s = date.split(' ')
     if len(date_s) == 1:
@@ -24,12 +24,7 @@ def relocate_date_format(date):  # June 1963, 11 June 1964, => June 1, 1963, Jun
     if len(date_s) == 2 :
         m_date = date_s[0] + ' 1, ' + date_s[1]
         return m_date
-    if len(date_s) == 1: print(" dddd ", date_s)
-    if date_s[1] in month_list:
-        m_date = date_s[1] + ' ' + date_s[0]+', ' + date_s[2]
-        return m_date
-    else:
-        return date
+    return date
 
 def date_conversion(date):
     if isinstance(date, list):
@@ -56,7 +51,13 @@ def datetime_conversion(date):
     else:
         i_date = re.search(datetime_re, date)
 
-    return datetime.strptime(change_date_to_num(i_date), '%m-%d-%Y')
+    # return datetime.strptime(change_date_to_num(i_date), '%m-%d-%Y')  # for this, needed change to num.
+    fmts = ['%B %d, %Y', '%d %B %Y']
+    for fmt in fmts:
+        try:
+            return datetime.strptime(i_date.group(), fmt)  # for this, no need to change to num. use %B
+        except:
+            pass
 
 
 if __name__ == '__main__':
