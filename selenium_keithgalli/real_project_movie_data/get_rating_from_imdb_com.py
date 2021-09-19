@@ -1,6 +1,6 @@
 # Task 4 attach IMDB/Rotten Tomato Scores
 from module_collection import  load_data, save_data_pickle, load_data_pickle
-from module_get_movie_scores import get_movie_score
+from module_get_rating_from_imdb import get_movie_rating_imdb
 from module_datetime_conversion import date_conversion
 import pickle
 import json
@@ -9,7 +9,7 @@ import re
 movie_info_list = load_data_pickle('data/disney_datad.pkl')
 # use dombo 1941.
 
-#get_movie_score()
+#get_movie_rating_imdb()
 # for movie in movie_info_list:
 movie_info_list_temp = []
 for movie in movie_info_list[14:15]:
@@ -20,7 +20,7 @@ for movie in movie_info_list[14:15]:
     if date == 'N/A':
         continue  #
     year = date.strftime('%Y')
-    score, base = get_movie_score(title, year)
+    score, base = get_movie_rating_imdb(title, year)
     print("IN Main", score, base)
     movie['Rating'] = score
     movie_info_list_temp.append(movie)

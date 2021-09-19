@@ -8,7 +8,7 @@ import time
 # title = 'Make Mine Music' ; year = 1946  # worked
 # title = 'Westward Ho, the Wagons!' ; year = 1956 # different name, in imdb, there is a comma after 'Ho', whereas no comma in the movie list in hollywood list.
 
-def get_movie_score(title, year):
+def get_movie_rating_imdb(title, year):
     PATH = './chromedriver.exe'
     # options = webdriver.ChromeOptions()  # 옵션 생성
     # options.add_argument("--headless")  # 창 숨기는 옵션 추가
@@ -53,4 +53,4 @@ def get_movie_score(title, year):
 if __name__ == '__main__':
     title = 'So Dear to My Heart'
     year = 1948
-    get_movie_score(title, year)
+    get_movie_rating_imdb(title, year)
