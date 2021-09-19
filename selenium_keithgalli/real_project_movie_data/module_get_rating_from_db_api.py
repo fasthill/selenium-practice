@@ -2,7 +2,8 @@
 # use http://www.omdbapi.com/
 # http://www.omdbapi.com/?i=tt3896198&apikey=1910a0fd
 # http://www.omdbapi.com/?apikey=[yourkey]&
-# apikey hide : 고급시스템설정 -> 시스템 속성 -> 환경변수 > 시스템변수 -> 새로만들기 -> 변수명, 값입력
+# apikey hide : 고급시스템설정 -> 시스템 속성 -> 환경변수
+# -> 시스템변수 -> 새로만들기 -> 변수명, 값입력  ## pc를 꼇다 켜야 인식함
 # os.environ['변수명'] <- 값을 대체 (비밀번호일 경우 시스템변수 사용)
 
 import json
@@ -14,8 +15,7 @@ import os
 def get_rating_db(title, year):
     print(f'Title: {title}, Year: {year}')
     base_url = 'https://www.omdbapi.com/?'
-    # parameters = {'apikey': os.environ['OMDB_API_KEY'], 't': title}
-    parameters = {'apikey': '1910a0fd', 't': title, 'y': year}  # get the parameter info in the api homepage
+    parameters = {'apikey': os.environ['OMDB_API_KEY'], 't': title, 'y': year}  # get the parameter info in the api homepage
     params_encoded = urllib.parse.urlencode(parameters)
     full_url = base_url + params_encoded
     data_json = requests.get(full_url).json()
