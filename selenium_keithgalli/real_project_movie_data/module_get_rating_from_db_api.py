@@ -12,10 +12,13 @@ import requests
 import urllib
 import os
 
-def get_rating_db(title, year):
-    print(f'Title: {title}, Year: {year}')
+def get_rating_db(title, year=0):
+    # print(f'Title: {title}, Year: {year}')
     base_url = 'https://www.omdbapi.com/?'
-    parameters = {'apikey': os.environ['OMDB_API_KEY'], 't': title, 'y': year}  # get the parameter info in the api homepage
+    if year == 0 :
+        parameters = {'apikey': os.environ['OMDB_API_KEY'], 't': title}
+    else:
+        parameters = {'apikey': os.environ['OMDB_API_KEY'], 't': title, 'y': year}  # get the parameter info in the api homepage
     params_encoded = urllib.parse.urlencode(parameters)
     full_url = base_url + params_encoded
     data_json = requests.get(full_url).json()
@@ -34,7 +37,9 @@ if __name__ == '__main__':
     # title = 'Make Mine Music' ; year = 1946  # worked
     # title = 'Westward Ho, the Wagons!' ; year = 1956 # different name, in imdb, there is a comma after 'Ho', whereas no comma in the movie list in hollywood list.
     # title = 'Fun and Fancy Free' ;  year = str(1947)  # 1947 release 편은 데이터 없음.
-    title = 'Scandalous John' ; year = '1971'
+    # title = 'Scandalous John' ; year = '1971'
+    # title = 'The Three Lives of Thomasina' ; year = '1963'
+    title = 'Peter Pan & Wendy' ; year = '2022'
     rating_value = get_rating_db(title, year)
     print('def IMDB Rating ', rating_value[0],
           'Rotten Value ', rating_value[1])
